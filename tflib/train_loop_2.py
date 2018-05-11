@@ -4,7 +4,7 @@ import numpy as np
 import tensorflow as tf
 
 import collections
-import cPickle as pickle
+import pickle
 import json
 import locale
 import os
@@ -44,7 +44,7 @@ def train_loop(
         colocate_gradients_with_ops=True
     )
 
-    print "Params:"
+    print("Params:")
     total_param_count = 0
     for g, v in grads_and_vars:
         shape = v.get_shape()
@@ -56,12 +56,12 @@ def train_loop(
         total_param_count += param_count
 
         if g == None:
-            print "\t{} ({}) [no grad!]".format(v.name, shape_str)
+            print("\t{} ({}) [no grad!]".format(v.name, shape_str))
         else:
-            print "\t{} ({})".format(v.name, shape_str)
-    print "Total param count: {}".format(
+            print("\t{} ({})".format(v.name, shape_str))
+    print("Total param count: {}".format(
         locale.format("%d", total_param_count, grouping=True)
-    )
+    ))
 
     # for i in xrange(len(grads_and_vars)):
     #     g, v = grads_and_vars[i]
@@ -123,12 +123,12 @@ def train_loop(
     saver = tf.train.Saver(write_version=tf.train.SaverDef.V2)
 
     if os.path.isfile(TRAIN_LOOP_FILE):
-        print "Resuming interrupted train loop session"
+        print("Resuming interrupted train loop session")
         with open(TRAIN_LOOP_FILE, 'r') as f:
             _vars = pickle.load(f)
         saver.restore(session, os.getcwd()+"/"+PARAMS_FILE)
 
-        print "Fast-fowarding dataset generator"
+        print("Fast-fowarding dataset generator")
         dataset_iters = 0
         while dataset_iters < _vars['iteration']:
             try:
@@ -138,9 +138,9 @@ def train_loop(
                 train_generator.next()
             dataset_iters += 1
     else:
-        print "Initializing variables..."
+        print("Initializing variables...")
         session.run(tf.initialize_all_variables())
-        print "done!"
+        print("done!")
 
     train_output_entries = [[]]
     
@@ -164,10 +164,10 @@ def train_loop(
                 print_str += "{}:{}\t".format(k,v)
             else:
                 print_str += "{}:{:.4f}\t".format(k,v)
-        print print_str[:-1] # omit the last \t
+        print(print_str[:-1]) # omit the last \t
 
     def save_train_output_and_params(iteration):
-        print "Saving things..."
+        print("Saving things...")
 
         if save_checkpoints:
             # Saving weights takes a while. There's a risk of interruption during
@@ -175,12 +175,12 @@ def train_loop(
 
             start_time = time.time()
             saver.save(session, PARAMS_FILE)
-            print "saver.save time: {}".format(time.time() - start_time)
+            print("saver.save time: {}".format(time.time() - start_time))
 
             start_time = time.time()
             with open(TRAIN_LOOP_FILE, 'w') as f:
                 pickle.dump(_vars, f)
-            print "_vars pickle dump time: {}".format(time.time() - start_time)
+            print("_vars pickle dump time: {}".format(time.time() - start_time))
 
         start_time = time.time()
         with open(TRAIN_OUTPUT_FILE, 'a') as f:
@@ -189,7 +189,7 @@ def train_loop(
                     if isinstance(v, np.generic):
                         entry[k] = np.asscalar(v)
                 f.write(json.dumps(entry) + "\n")
-        print "ndjson write time: {}".format(time.time() - start_time)
+        print("ndjson write time: {}".format(time.time() - start_time))
 
         train_output_entries[0] = []
 
@@ -198,7 +198,7 @@ def train_loop(
         if _vars['iteration'] == stop_after:
             save_train_output_and_params(_vars['iteration'])
 
-            print "Done!"
+            print("Done!")
 
             try: # This only matters on Ishaan's computer
                 import experiment_tools
@@ -222,6 +222,7 @@ def train_loop(
             input_vals = [np.int32(_vars['iteration'])] + list(input_vals)
 
         start_time = time.time()
+        # print 'input vals', len(input_vals), input_vals[0], input_vals[1].shape
         outputs = train_fn(input_vals)
         run_time = time.time() - start_time
 

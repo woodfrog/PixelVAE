@@ -3,3 +3,5 @@ pull
 push
 experiment_tools.py
 scribe
+*.pyc
+*.png

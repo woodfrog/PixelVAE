@@ -84,8 +84,8 @@ def delete_all_params():
 #     )
 
 def print_model_settings(locals_):
-    print "Model settings:"
+    print("Model settings:")
     all_vars = [(k,v) for (k,v) in locals_.items() if (k.isupper() and k!='T')]
     all_vars = sorted(all_vars, key=lambda x: x[0])
     for var_name, var_value in all_vars:
-        print "\t{}: {}".format(var_name, var_value)
+        print("\t{}: {}".format(var_name, var_value))

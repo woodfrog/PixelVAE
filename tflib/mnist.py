@@ -3,10 +3,11 @@ import numpy
 import os
 import urllib
 import gzip
-import cPickle as pickle
+import pickle
 
 def mnist_generator(data, batch_size, n_labelled):
     images, targets = data
+    print('total number of images: {}'.format(len(images)))
 
     images = images.astype('float32')
     targets = targets.astype('int32')
@@ -41,14 +42,14 @@ def mnist_generator(data, batch_size, n_labelled):
     return get_epoch
 
 def load(batch_size, test_batch_size, n_labelled=None):
-    filepath = '/tmp/mnist.pkl.gz'
+    filepath = './mnist.pkl.gz'
     url = 'http://www.iro.umontreal.ca/~lisa/deep/data/mnist/mnist.pkl.gz'
 
     if not os.path.isfile(filepath):
-        print "Couldn't find MNIST dataset in /tmp, downloading..."
+        print("Couldn't find MNIST dataset in /tmp, downloading...")
         urllib.urlretrieve(url, filepath)
 
-    with gzip.open('/tmp/mnist.pkl.gz', 'rb') as f:
+    with gzip.open('./mnist.pkl.gz', 'rb') as f:
         train_data, dev_data, test_data = pickle.load(f)
 
     return (
@@ -56,3 +57,10 @@ def load(batch_size, test_batch_size, n_labelled=None):
         mnist_generator(dev_data, test_batch_size, n_labelled), 
         mnist_generator(test_data, test_batch_size, n_labelled)
     )
+
+
+if __name__ == '__main__':
+    train_data, test_data, gen_data = load(16, 16, None)
+    train_gen = train_data()
+
+    import IPython; IPython.embed()
